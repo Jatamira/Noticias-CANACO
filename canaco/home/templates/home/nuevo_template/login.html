@@ -1,0 +1,143 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Iniciar Sesión - Noticias Canaco</title>
+
+  <!-- Favicons -->
+  <link href="{% static 'nuevo_template/img/favicon.png' %}" rel="icon">
+  <link href="{% static 'nuevo_template/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{% static 'nuevo_template/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'nuevo_template/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'nuevo_template/vendor/aos/aos.css' %}" rel="stylesheet">
+  <link href="{% static 'nuevo_template/vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet">
+  <link href="{% static 'nuevo_template/vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="{% static 'nuevo_template/css/main.css' %}" rel="stylesheet">
+</head>
+
+<body class="login-page">
+
+  <!-- Header -->
+  <header id="header" class="header position-relative">
+    <div class="container-fluid container-xl position-relative">
+      <div class="top-row d-flex align-items-center justify-content-between">
+        <a href="{% url 'home:index' %}" class="logo d-flex align-items-end">
+          <h1 class="sitename">Noticias Canaco</h1><span>.</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="nav-wrap">
+      <div class="container d-flex justify-content-center position-relative">
+        <nav id="navmenu" class="navmenu">
+          <ul>
+            <li><a href="{% url 'home:index' %}">Home</a></li>
+            <li><a href="{% url 'home:category' %}">Category</a></li>
+            <li><a href="{% url 'home:perfil' %}">Perfil</a></li>
+            <li><a href="{% url 'home:author-profile' %}">Autor</a></li>
+            <li><a href="{% url 'home:contactanos' %}">Contact</a></li>
+            <li><a href="{% url 'home:login' %}" class="active">Login</a></li>
+            <li><a href="{% url 'home:sign_up' %}">Sign Up</a></li>
+          </ul>
+          <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- Page Title -->
+    <div class="page-title">
+      <div class="container d-lg-flex justify-content-between align-items-center">
+        <h1 class="mb-2 mb-lg-0">Iniciar Sesión</h1>
+        <nav class="breadcrumbs">
+          <ol>
+            <li><a href="{% url 'home:index' %}">Home</a></li>
+            <li>Login</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Login Section -->
+    <section class="section">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-md-6 col-lg-4">
+            
+            <div class="p-4 border rounded bg-light shadow-sm">
+              <h3 class="text-center mb-4">Acceso al Sistema</h3>
+
+              <!-- Alerta de errores de autenticación -->
+              {% if form.errors %}
+              <div class="alert alert-danger" role="alert">
+                  Usuario o contraseña incorrectos.
+              </div>
+              {% endif %}
+
+              <!-- Alertas generales del sistema -->
+              {% if messages %}
+                  {% for message in messages %}
+                  <div class="alert alert-{{ message.tags }}" role="alert">
+                      {{ message }}
+                  </div>
+                  {% endfor %}
+              {% endif %}
+
+              <!-- Formulario de Login -->
+              <form method="POST">
+                  {% csrf_token %}
+                  
+                  <div class="mb-3">
+                      <label for="username" class="form-label">Usuario</label>
+                      <input type="text" class="form-control" id="username" name="username" required autofocus>
+                  </div>
+
+                  <div class="mb-3">
+                      <label for="password" class="form-label">Contraseña</label>
+                      <input type="password" class="form-control" id="password" name="password" required>
+                  </div>
+
+                  <div class="d-grid gap-2">
+                      <button type="submit" class="btn btn-primary">Ingresar</button>
+                      <a href="{% url 'home:sign_up' %}" class="btn btn-outline-secondary">Crear cuenta</a>
+                  </div>
+              </form>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer id="footer" class="footer">
+    <div class="container copyright text-center mt-4">
+      <p>© <span>Copyright</span> <strong class="px-1 sitename">Canaco</strong> <span>All Rights Reserved</span></p>
+    </div>
+  </footer>
+
+  <!-- Vendor JS Files -->
+  <script src="{% static 'nuevo_template/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'nuevo_template/vendor/aos/aos.js' %}"></script>
+  <script src="{% static 'nuevo_template/vendor/swiper/swiper-bundle.min.js' %}"></script>
+  <script src="{% static 'nuevo_template/vendor/glightbox/js/glightbox.min.js' %}"></script>
+
+</body>
+
+</html>

@@ -5,9 +5,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Perfil, Archivo, Categoria, Comentario, GaleriaPublicacion, Publicacion
 from django.contrib import messages
-from django.shortcuts import redirect
 from django.contrib.auth.models import User
-from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth import authenticate, login as auth_login, update_session_auth_hash
 from django.core.files.storage import default_storage
 from django.db.models import F
 
@@ -16,36 +15,166 @@ def es_operador(user):
 
 operador_required = user_passes_test(es_operador)
 
-# Create your views here.
+# ==========================================
+# VISTAS DEL NUEVO TEMPLATE (Visuales)
+# ==========================================
 
-def index(request):
-    publicaciones = Publicacion.objects.filter(
-        estado = Publicacion.ESTADO_PUBLICADO,
-    ).select_related('categoria', 'autor', 'imagen_portada').order_by('-createdat')
-    return render(request, 'home/index.html', {
-        'slider': publicaciones[:3],
-        'publicaciones': publicaciones,
-    })
-
-def base(request):
-    return render(request, 'home/base.html')
-
-def contactanos(request):
-    return render(request, 'home/contactanos.html')
-
-def categoria(request, pk=None):
+def category(request, pk=None):
     categorias = Categoria.objects.all().order_by('nombre')
     categoria_actual = get_object_or_404(Categoria, pk=pk) if pk else None
-    publicaciones = Publicacion.objects.filter(estado=Publicacion.ESTADO_PUBLICADO).select_related(
-        'categoria', 'autor', 'imagen_portada'
-    )
+
+    publicaciones = Publicacion.objects.filter(
+        estado=Publicacion.ESTADO_PUBLICADO
+    ).select_related('categoria', 'autor', 'imagen_portada')
+
     if categoria_actual:
         publicaciones = publicaciones.filter(categoria=categoria_actual)
-    return render(request, 'home/categoria.html', {
+
+    print("PUBLICACIONES EN CATEGORÍA:", publicaciones.count())
+
+    return render(request, 'home/nuevo_template/category.html', {
         'categorias': categorias,
         'categoria_actual': categoria_actual,
         'publicaciones': publicaciones.order_by('-createdat'),
     })
+
+def author_profile(request):
+    return render(request, 'home/nuevo_template/author-profile.html')
+
+def login(request):
+    if request.method == 'POST':
+        username = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '')
+
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            auth_login(request, user)
+            messages.success(request, '¡Bienvenido de nuevo!')
+            next_url = request.GET.get('next') or 'home:perfil'
+            return redirect(next_url)
+        else:
+            messages.error(request, 'Usuario o contraseña incorrectos.')
+            return redirect('home:login')
+
+    return render(request, 'home/nuevo_template/login.html')
+
+def sign_up(request):
+    if request.method == 'POST':
+        username = request.POST.get('username', '').strip()
+        email = request.POST.get('email', '').strip()
+        first_name = request.POST.get('first_name', '').strip()
+        apellido_paterno = request.POST.get('apellido_paterno','').strip()
+        apellido_materno = request.POST.get('apellido_materno','').strip()
+        password1 = request.POST.get('password1', '')
+        password2 = request.POST.get('password2', '')
+
+        if password1 != password2:
+            messages.error(request, 'Las contraseñas no coinciden.')
+            return redirect('home:sign_up')
+        
+        if User.objects.filter(username=username).exists():
+            messages.error(request, 'El nombre de usuario ya está en uso.')
+            return redirect('home:sign_up')
+ 
+        if email and User.objects.filter(email=email).exists():
+            messages.error(request, 'El correo electrónico ya está registrado.')
+            return redirect('home:sign_up')
+
+        user = User.objects.create_user(username=username, email=email, password=password1)
+        user.first_name = first_name
+        user.last_name = ' '.join(filter(None, [apellido_paterno, apellido_materno]))
+        user.save()
+        
+        perfil, _ = Perfil.objects.get_or_create(user=user)
+        perfil.apellido_paterno = apellido_paterno
+        perfil.apellido_materno = apellido_materno
+        perfil.save()
+
+        messages.success(request, '¡Cuenta creada con éxito! Por favor, inicia sesión.')
+        return redirect('home:login')
+
+    return render(request, 'home/nuevo_template/sign_up.html')
+
+def index(request):
+    publicaciones = Publicacion.objects.filter(
+        estado=Publicacion.ESTADO_PUBLICADO
+    ).select_related(
+        'categoria',
+        'autor',
+        'imagen_portada'
+    )
+
+    # Cinco noticias más vistas
+    mas_vistas = publicaciones.order_by(
+        '-visitas',
+        '-createdat'
+    )[:5]
+
+    # Noticias más recientes para el carrusel
+    recientes = publicaciones.order_by(
+        '-createdat'
+    )[:8]
+    print("NOTICIAS PARA EL CARRUSEL:", recientes.count())
+
+    # Una noticia reciente por cada categoría
+    categorias = Categoria.objects.all().order_by('nombre')
+
+    noticias_por_categoria = []
+
+    for categoria in categorias:
+        noticia_categoria = publicaciones.filter(
+            categoria=categoria
+        ).order_by('-createdat').first()
+
+        if noticia_categoria:
+            noticias_por_categoria.append({
+                'categoria': categoria,
+                'publicacion': noticia_categoria
+            })
+
+    return render(
+        request,
+        'home/nuevo_template/index.html',
+        {
+            'mas_vistas': mas_vistas,
+            'recientes': recientes,
+            'noticias_por_categoria': noticias_por_categoria,
+        }
+    )
+
+def base(request):
+    return render(request, 'home/base.html')
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+
+def contactanos(request):
+
+    if request.method == 'POST':
+        nombre = request.POST.get('name', '').strip()
+        correo = request.POST.get('email', '').strip()
+        telefono = request.POST.get('phone', '').strip()
+        asunto = request.POST.get('subject', '').strip()
+        mensaje = request.POST.get('message', '').strip()
+
+        if not nombre or not correo or not asunto or not mensaje:
+            messages.error(request, 'Por favor, completa todos los campos obligatorios.')
+            return redirect('home:contactanos')
+
+        # Por ahora, confirmamos la recepción del mensaje.
+        messages.success(
+            request,
+            'Tu mensaje fue recibido correctamente. Gracias por contactar a Noticias CANACO.'
+        )
+
+        return redirect('home:contactanos')
+
+    return render(request, 'home/nuevo_template/contactanos.html')
+
+
+# ==========================================
+# VISTAS Y LOGICA DEL PROYECTO
+# ==========================================
 
 def noticia(request, pk=None):
     if pk and es_operador(request.user):
@@ -76,7 +205,7 @@ def noticia(request, pk=None):
         estado=Comentario.ESTADO_APROBADO,
     ).select_related('user').order_by('-createdat')
     categorias = Categoria.objects.all().order_by('nombre')
-    return render(request, 'home/noticia.html', {
+    return render(request, 'home/nuevo_template/noticia.html', {
         'publicacion': publicacion,
         'recientes': recientes,
         'comentarios': comentarios,
@@ -103,7 +232,7 @@ def crear_publicacion(request):
             GaleriaPublicacion.objects.create(publicacion=publicacion, archivo=guardar_archivo(imagen, request.user))
         messages.success(request, 'Publicación creada correctamente.')
         return redirect('home:crud_noticias')
-    return render(request, 'home/crear_publicacion.html', {'categorias': categorias})
+    return render(request, 'home/nuevo_template/crear_publicacion.html', {'categorias': categorias})
 
 @operador_required
 def editar_publicacion(request, pk):
@@ -123,7 +252,7 @@ def editar_publicacion(request, pk):
             GaleriaPublicacion.objects.create(publicacion=publicacion, archivo=guardar_archivo(imagen, request.user))
         messages.success(request, 'Publicación actualizada correctamente.')
         return redirect('home:crud_noticias')
-    return render(request, 'home/crear_publicacion.html', {
+    return render(request, 'home/nuevo_template/crear_publicacion.html', {
         'categorias': categorias,
         'publicacion': publicacion,
     })
@@ -143,50 +272,13 @@ def eliminar_publicacion(request, pk):
         messages.success(request, 'Publicación eliminada correctamente.')
     return redirect('home:crud_noticias')
 
-
 @login_required
 def perfil(request):
     perfil_usuario, _ = Perfil.objects.get_or_create(user=request.user)
-    return render(request, 'home/perfil.html', {'perfil_usuario': perfil_usuario})
-
-
-def sign_up(request):
-    if request.method == 'POST':
-        username = request.POST.get('username', '').strip()
-        email = request.POST.get('email', '').strip()
-        first_name = request.POST.get('first_name', '').strip()
-        apellido_paterno = request.POST.get('apellido_paterno','').strip()
-        apellido_materno = request.POST.get('apellido_materno','').strip()
-        password1 = request.POST.get('password1', '')
-        password2 = request.POST.get('password2', '')
-
-        if password1 != password2:
-            messages.error(request, 'Las contraseñas no coinciden.')
-            return redirect('home:sign_up')
-        
-        if User.objects.filter(username=username).exists():
-            messages.error(request, 'El nombre de usuario ya está en uso.')
-            return redirect('home:sign_up')
- 
-        if User.objects.filter(email=email).exists():
-            messages.error(request, 'El correo electrónico ya está registrado.')
-            return redirect('home:sign_up')
-
-        user = User.objects.create_user(username=username, email=email, password=password1)
-        user.first_name = first_name
-        user.last_name = ' '.join(filter(None, [apellido_paterno, apellido_materno]))
-        user.save()
-        perfil, _ = Perfil.objects.get_or_create(user=user)
-        perfil.apellido_paterno = apellido_paterno
-        perfil.apellido_materno = apellido_materno
-        perfil.save()
-        messages.success(request, 'Tu cuenta ha sido creada con éxito. Ahora puedes iniciar sesión.')
-        return redirect('home:login')
-
-    return render(request, 'home/sign_up.html')
+    return render(request, 'home/nuevo_template/perfil.html', {'perfil_usuario': perfil_usuario})
 
 def usuario(request):
-    return render(request, 'home/crear_usuario.html')
+    return render(request, 'home/nuevo_template/crear_usuario.html')
 
 @login_required
 def crud_cambiar_contrasena(request):
@@ -212,7 +304,7 @@ def crud_cambiar_contrasena(request):
         messages.success(request, 'Contraseña actualizada correctamente.')
         
         return redirect('home:crud_cambiar_contrasena')
-    return render(request, 'home/crud_cambiar_contrasena.html')
+    return render(request, 'home/nuevo_template/crud_cambiar_contrasena.html')
 
 @operador_required
 def crud_categorias(request):
@@ -223,7 +315,7 @@ def crud_categorias(request):
             messages.success(request, 'Categoría agregada correctamente.')
             return redirect('home:crud_categorias')
     categorias = Categoria.objects.all().order_by('-createdat')
-    return render(request, 'home/crud_categorias.html', {'categorias': categorias})
+    return render(request, 'home/nuevo_template/crud_categorias.html', {'categorias': categorias})
         
 @operador_required
 def editar_categoria(request, pk):
@@ -235,7 +327,7 @@ def editar_categoria(request, pk):
             categoria.save()
             messages.success(request, 'Categoría actualizada correctamente.')
         return redirect('home:crud_categorias')
-    return render(request, 'home/editar_categoria.html', {'categoria': categoria})
+    return render(request, 'home/nuevo_template/editar_categoria.html', {'categoria': categoria})
 
 @operador_required
 def eliminar_categoria(request, pk):
@@ -248,7 +340,7 @@ def eliminar_categoria(request, pk):
 @operador_required
 def crud_comentarios(request):
     comentarios = Comentario.objects.select_related('publicacion', 'user').order_by('-createdat')
-    return render(request, 'home/crud_comentarios.html', {'comentarios': comentarios})
+    return render(request, 'home/nuevo_template/crud_comentarios.html', {'comentarios': comentarios})
 
 @operador_required
 def aprobar_comentario(request, pk):
@@ -274,7 +366,7 @@ def eliminar_comentario(request, pk):
 @operador_required
 def crud_noticias(request):
     publicaciones = Publicacion.objects.select_related('categoria', 'autor').order_by('-createdat')
-    return render(request, 'home/crud_noticias.html', {'publicaciones': publicaciones})
+    return render(request, 'home/nuevo_template/crud_noticias.html', {'publicaciones': publicaciones})
 
 @login_required
 def crud_perfil(request):
@@ -319,7 +411,7 @@ def crud_perfil(request):
         messages.success(request, 'Perfil actualizado correctamente.')
         return redirect('home:perfil')
         
-    return render(request, 'home/crud_perfil.html', {'perfil_usuario': perfil})
+    return render(request, 'home/nuevo_template/crud_perfil.html', {'perfil_usuario': perfil})
 
 def guardar_archivo(upload, user):
     filename = default_storage.save(f"uploads/{upload.name}", upload)
@@ -337,7 +429,7 @@ def crud_usuarios(request):
     for usuario in User.objects.all():
         Perfil.objects.get_or_create(user=usuario)
     usuarios = User.objects.select_related('perfil').order_by('date_joined')
-    return render(request, 'home/crud_usuarios.html', {'usuarios': usuarios})
+    return render(request, 'home/nuevo_template/crud_usuarios.html', {'usuarios': usuarios})
 
 @operador_required
 def crear_usuario(request):
@@ -379,7 +471,7 @@ def crear_usuario(request):
         messages.success(request, 'Usuario creado correctamente.')
         return redirect('home:crud_usuarios')
         
-    return render(request, 'home/crear_usuario.html')
+    return render(request, 'home/nuevo_template/crear_usuario.html')
 
 @operador_required
 def editar_usuario(request, pk):
@@ -407,7 +499,7 @@ def editar_usuario(request, pk):
         perfil.save()
         messages.success(request, 'Usuario actualizado correctamente.')
         return redirect('home:crud_usuarios')
-    return render(request, 'home/crear_usuario.html', {
+    return render(request, 'home/nuevo_template/crear_usuario.html', {
         'usuario_editado': usuario,
         'perfil_editado': perfil,
     })
@@ -425,4 +517,4 @@ def eliminar_usuario(request, pk):
     usuario = get_object_or_404(User, pk=pk)
     if request.method == 'POST' and usuario != request.user:
         usuario.delete()
-    return redirect('home:crud_usuarios') 
+    return redirect('home:crud_usuarios')

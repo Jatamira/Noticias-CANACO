@@ -1,0 +1,279 @@
+
+{% extends 'partials/base.html' %}
+
+{% block title %}Contacto | Noticias CANACO{% endblock %}
+{% block body_class %}contact-page{% endblock %}
+
+{% block content %}
+
+<main class="main">
+
+  <!-- Título de página -->
+  <div class="page-title">
+
+    <div class="breadcrumbs">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="{% url 'home:index' %}">
+              <i class="bi bi-house"></i> Inicio
+            </a>
+          </li>
+
+          <li class="breadcrumb-item active current">
+            Contacto
+          </li>
+        </ol>
+      </nav>
+    </div>
+
+    <div class="title-wrapper">
+      <h1>Contacto</h1>
+      <p>
+        Estamos interesados en conocer tus opiniones, resolver tus dudas
+        y recibir tus comentarios sobre las noticias y publicaciones
+        de CANACO.
+      </p>
+    </div>
+
+  </div>
+  <!-- /Page Title -->
+
+
+  <!-- Contact Section -->
+  <section id="contact" class="contact section">
+
+    <div class="container">
+
+      <!-- Tarjetas de información -->
+      <div class="row gy-4 mb-5">
+
+        <div class="col-lg-4">
+          <div class="info-card">
+
+            <div class="icon-box">
+              <i class="bi bi-geo-alt"></i>
+            </div>
+
+            <h3>Ubicación</h3>
+
+            <p>
+              Villahermosa, Tabasco, México.
+            </p>
+
+          </div>
+        </div>
+
+
+        <div class="col-lg-4">
+          <div class="info-card">
+
+            <div class="icon-box">
+              <i class="bi bi-envelope"></i>
+            </div>
+
+            <h3>Atención y consultas</h3>
+
+            <p>
+              Ponte en contacto con nosotros para resolver tus dudas
+              o compartir información relacionada con las noticias.
+            </p>
+
+          </div>
+        </div>
+
+
+        <div class="col-lg-4">
+          <div class="info-card">
+
+            <div class="icon-box">
+              <i class="bi bi-newspaper"></i>
+            </div>
+
+            <h3>Información de noticias</h3>
+
+            <p>
+              Recibimos comentarios, sugerencias y consultas
+              sobre nuestras publicaciones.
+            </p>
+
+          </div>
+        </div>
+
+      </div>
+
+
+      <!-- Formulario de contacto -->
+      <div class="row">
+
+        <div class="col-lg-12">
+
+          <div class="form-wrapper">
+
+            <h3 class="mb-4">Envíanos un mensaje</h3>
+
+            <p class="mb-4">
+              Completa el siguiente formulario para enviarnos tus
+              comentarios, dudas o sugerencias sobre el portal
+              de Noticias CANACO.
+            </p>
+
+            {% if messages %}
+              {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                  {{ message }}
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Cerrar"
+                  ></button>
+                </div>
+              {% endfor %}
+            {% endif %}
+
+            <form method="POST" role="form" class="php-email-form">
+
+              {% csrf_token %}
+
+              <div class="row">
+
+                <div class="col-md-6 form-group">
+
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="bi bi-person"></i>
+                    </span>
+
+                    <input
+                      type="text"
+                      name="name"
+                      class="form-control"
+                      placeholder="Nombre completo *"
+                      required
+                    >
+                  </div>
+
+                </div>
+
+
+                <div class="col-md-6 form-group">
+
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="bi bi-envelope"></i>
+                    </span>
+
+                    <input
+                      type="email"
+                      name="email"
+                      class="form-control"
+                      placeholder="Correo electrónico *"
+                      required
+                    >
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              <div class="row mt-3">
+
+                <div class="col-md-6 form-group">
+
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="bi bi-phone"></i>
+                    </span>
+
+                    <input
+                      type="text"
+                      name="phone"
+                      class="form-control"
+                      placeholder="Número de teléfono"
+                    >
+                  </div>
+
+                </div>
+
+
+                <div class="col-md-6 form-group">
+
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="bi bi-list"></i>
+                    </span>
+
+                    <select
+                      name="subject"
+                      class="form-control"
+                      required
+                    >
+                      <option value="">Selecciona el motivo *</option>
+                      <option value="Consulta sobre noticias">
+                        Consulta sobre noticias
+                      </option>
+                      <option value="Sugerencia">
+                        Sugerencia
+                      </option>
+                      <option value="Correccion de informacion">
+                        Corrección de información
+                      </option>
+                      <option value="Colaboracion">
+                        Colaboración
+                      </option>
+                      <option value="Otro">
+                        Otro asunto
+                      </option>
+                    </select>
+                  </div>
+
+                </div>
+
+
+                <div class="form-group mt-3">
+
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="bi bi-chat-dots"></i>
+                    </span>
+
+                    <textarea
+                      name="message"
+                      class="form-control"
+                      rows="6"
+                      placeholder="Escribe tu mensaje aquí *"
+                      required
+                    ></textarea>
+                  </div>
+
+                </div>
+
+
+                <div class="text-center mt-4">
+
+                  <button type="submit">
+                    Enviar mensaje
+                  </button>
+
+                </div>
+
+              </div>
+
+            </form>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+  <!-- /Contact Section -->
+
+</main>
+
+{% endblock %}

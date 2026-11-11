@@ -1,0 +1,113 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Gestión de Usuarios - Noticias Canaco</title>
+  <link href="{% static 'nuevo_template/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'nuevo_template/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'nuevo_template/css/main.css' %}" rel="stylesheet">
+  <style>
+    .admin-layout { display: flex; min-height: 70vh; }
+    .admin-sidebar { width: 260px; background: #f8f9fa; border-right: 1px solid #dee2e6; display: flex; flex-direction: column; justify-content: space-between; }
+    .admin-sidebar .nav-link-item { padding: 12px 20px; color: #dc3545; text-decoration: none; display: block; border-bottom: 1px solid #e9ecef; font-weight: 500; }
+    .admin-sidebar .nav-link-item:hover, .admin-sidebar .nav-link-item.active { background: #dc3545; color: #fff; border-left: 5px solid #ffc107; }
+    .admin-content { flex: 1; padding: 40px; background: #ffffff; }
+  </style>
+</head>
+<body class="profile-page">
+  <header id="header" class="header position-relative">
+    <div class="container-fluid container-xl position-relative">
+      <div class="top-row d-flex align-items-center justify-content-between">
+        <a href="{% url 'home:index' %}" class="logo d-flex align-items-end"><h1 class="sitename">Noticias Canaco</h1><span>.</span></a>
+      </div>
+    </div>
+    <div class="nav-wrap">
+      <div class="container d-flex justify-content-center position-relative">
+        <nav id="navmenu" class="navmenu">
+          <ul>
+            <li><a href="{% url 'home:index' %}">Home</a></li>
+            <li><a href="{% url 'home:category' %}">Category</a></li>
+            <li><a href="{% url 'home:perfil' %}">Perfil</a></li>
+            <li><a href="{% url 'home:author-profile' %}">Autor</a></li>
+            <li><a href="{% url 'home:contactanos' %}">Contact</a></li>
+            <li><a href="{% url 'home:login' %}">Login</a></li>
+            <li><a href="{% url 'home:sign_up' %}">Sign Up</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="page-title"><div class="container d-lg-flex justify-content-between align-items-center"><h1 class="mb-2 mb-lg-0">Gestión de Usuarios</h1></div></div>
+
+    <div class="container my-4">
+      <div class="admin-layout border rounded shadow-sm bg-white overflow-hidden">
+        <div class="admin-sidebar">
+          <div class="sidebar-links">
+            <a href="{% url 'home:perfil' %}" class="nav-link-item">Mi Perfil</a>
+            <a href="{% url 'home:crud_noticias' %}" class="nav-link-item">Noticias</a>
+            <a href="{% url 'home:crud_comentarios' %}" class="nav-link-item">Comentarios</a>
+            <a href="{% url 'home:crud_categorias' %}" class="nav-link-item">Categorías</a>
+            <a href="{% url 'home:crud_usuarios' %}" class="nav-link-item active">Usuarios</a>
+            <a href="{% url 'home:crud_cambiar_contrasena' %}" class="nav-link-item">Cambiar contraseña</a>
+          </div>
+          <div class="sidebar-footer p-3 bg-danger text-center">
+            <form action="{% url 'home:logout' %}" method="POST" class="m-0">{% csrf_token %}<button type="submit" class="btn btn-danger w-100 fw-bold text-uppercase">Cerrar sesión</button></form>
+          </div>
+        </div>
+
+        <div class="admin-content">
+          <div class="d-flex align-items-center justify-content-between mb-4">
+              <div><h3 class="mb-1">Lista de cuentas</h3></div>
+              <a href="{% url 'home:crear_usuario' %}" class="btn btn-primary"><i class="bi bi-plus-circle me-1"></i> Crear usuario</a>
+          </div>
+
+          {% if messages %}
+              {% for message in messages %}
+              <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">{{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button></div>
+              {% endfor %}
+          {% endif %}
+
+          <div class="table-responsive">
+              <table class="table table-striped table-hover align-middle">
+                  <thead class="table-dark">
+                      <tr><th>#</th><th>Usuario</th><th>Nombre</th><th>Correo</th><th>Rol</th><th>Estado</th><th colspan="3"></th></tr>
+                  </thead>
+                  <tbody>
+                      {% for user in usuarios %}
+                      <tr>
+                          <td>{{ forloop.counter }}</td>
+                          <td>{{ user.username }}</td>
+                          <td>{{ user.first_name|default:"-" }}</td>
+                          <td>{{ user.email|default:"-" }}</td>
+                          <td>
+                              {% if user.is_superuser %}Administrador
+                              {% elif user.is_staff %}Editor
+                              {% else %}Colaborador{% endif %}
+                          </td>
+                          <td>
+                              {% if user.is_active %}<span class="badge bg-success">Activo</span>
+                              {% else %}<span class="badge bg-danger">Bloqueado</span>{% endif %}
+                          </td>
+                          <td><a href="{% url 'home:editar_usuario' user.id %}" class="btn btn-info btn-sm">Editar</a></td>
+                          <td><a href="{% url 'home:bloquear_usuario' user.id %}" class="btn btn-warning btn-sm">{% if user.is_active %}Bloquear{% else %}Desbloquear{% endif %}</a></td>
+                          <td>
+                              <form method="post" action="{% url 'home:eliminar_usuario' user.id %}">{% csrf_token %}<button type="submit" class="btn btn-danger btn-sm">Eliminar</button></form>
+                          </td>
+                      </tr>
+                      {% empty %}
+                      <tr><td colspan="9" class="text-center">No hay usuarios registrados.</td></tr>
+                      {% endfor %}
+                  </tbody>
+              </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer id="footer" class="footer"><div class="container copyright text-center mt-4"><p>© <span>Copyright</span> <strong class="px-1 sitename">Canaco</strong></p></div></footer>
+  <script src="{% static 'nuevo_template/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

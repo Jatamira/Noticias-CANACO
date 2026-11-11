@@ -1,45 +1,96 @@
-{% load static %}
+
 {% with current=request.resolver_match.url_name %}
-<aside class="panel-sidebar flex-shrink-0">
-    <ul class="nav nav-pills nav-flush flex-column mb-auto text-start">
-        <li class="nav-item">
-            <a href="{% url 'home:perfil' %}" class="nav-link panel-nav-link {% if current == 'perfil' or current == 'crud_perfil' %}active{% endif %}">
-                <span>Mi Perfil</span>
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'home:crud_noticias' %}" class="nav-link panel-nav-link {% if current == 'crud_noticias' or current == 'crear_publicacion' or current == 'editar_publicacion' %}active{% endif %}">
-                <span>Noticias</span>
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'home:crud_comentarios' %}" class="nav-link panel-nav-link {% if current == 'crud_comentarios' %}active{% endif %}">
-                <span>Comentarios</span>
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'home:crud_categorias' %}" class="nav-link panel-nav-link {% if current == 'crud_categorias' or current == 'editar_categoria' %}active{% endif %}">
-                <span>Categorías</span>
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'home:crud_usuarios' %}" class="nav-link panel-nav-link {% if current == 'crud_usuarios' or current == 'crear_usuario' or current == 'editar_usuario' %}active{% endif %}">
-                <span>Usuarios</span>
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'home:crud_cambiar_contrasena' %}" class="nav-link panel-nav-link {% if current == 'crud_cambiar_contrasena' or current == 'crud_cambContra' %}active{% endif %}">
-                <span>Cambiar<br>contraseña</span>
-            </a>
-        </li>
-        <li>
-            <form method="post" action="{% url 'home:logout' %}" class="w-100">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger panel-logout-button w-100">
-                    <span>Cerrar sesión</span>
-                </button>
-            </form>
-        </li>
-    </ul>
-</aside>
+
+<div class="blog-sidebar">
+
+    <div class="sidebar-item">
+
+        <h3 class="sidebar-title">
+            Panel de administración
+        </h3>
+
+        <div class="mt-3">
+
+            <nav class="nav flex-column gap-2">
+
+                <a href="{% url 'home:perfil' %}"
+                   class="nav-link rounded {% if current == 'perfil' %}active{% endif %}">
+                    <i class="bi bi-person-circle me-2"></i>
+                    Mi perfil
+                </a>
+
+                <a href="{% url 'home:crud_noticias' %}"
+                   class="nav-link rounded {% if current == 'crud_noticias' or current == 'crear_publicacion' or current == 'editar_publicacion' %}active{% endif %}">
+                    <i class="bi bi-newspaper me-2"></i>
+                    Noticias
+                </a>
+
+                <a href="{% url 'home:crear_publicacion' %}"
+                   class="nav-link rounded {% if current == 'crear_publicacion' %}active{% endif %}">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    Nueva publicación
+                </a>
+
+                <a href="{% url 'home:crud_categorias' %}"
+                   class="nav-link rounded {% if current == 'crud_categorias' or current == 'editar_categoria' %}active{% endif %}">
+                    <i class="bi bi-tags me-2"></i>
+                    Categorías
+                </a>
+
+                <a href="{% url 'home:crud_comentarios' %}"
+                   class="nav-link rounded {% if current == 'crud_comentarios' %}active{% endif %}">
+                    <i class="bi bi-chat-left-text me-2"></i>
+                    Comentarios
+                </a>
+
+                <a href="{% url 'home:crud_usuarios' %}"
+                   class="nav-link rounded {% if current == 'crud_usuarios' or current == 'crear_usuario' or current == 'editar_usuario' %}active{% endif %}">
+                    <i class="bi bi-people me-2"></i>
+                    Usuarios
+                </a>
+
+                <a href="{% url 'home:crud_perfil' %}"
+                   class="nav-link rounded {% if current == 'crud_perfil' %}active{% endif %}">
+                    <i class="bi bi-person-gear me-2"></i>
+                    Editar perfil
+                </a>
+
+                <a href="{% url 'home:crud_cambiar_contrasena' %}"
+                   class="nav-link rounded {% if current == 'crud_cambiar_contrasena' %}active{% endif %}">
+                    <i class="bi bi-shield-lock me-2"></i>
+                    Cambiar contraseña
+                </a>
+
+                <a href="{% url 'home:index' %}" class="nav-link rounded">
+                    <i class="bi bi-house me-2"></i>
+                    Volver al inicio
+                </a>
+
+            </nav>
+
+        </div>
+
+    </div>
+
+    <style>
+        .blog-sidebar .nav-link {
+            color: var(--default-color);
+            font-weight: 500;
+            padding: 11px 14px;
+            transition: all 0.3s ease;
+        }
+
+        .blog-sidebar .nav-link:hover,
+        .blog-sidebar .nav-link.active {
+            color: var(--accent-color);
+            background: rgba(247, 88, 21, 0.08);
+        }
+
+        .blog-sidebar .nav-link i {
+            font-size: 17px;
+        }
+    </style>
+
+</div>
+
 {% endwith %}

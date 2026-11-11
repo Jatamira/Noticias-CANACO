@@ -1,61 +1,111 @@
+
 {% load static %}
-<div class="site-mobile-menu site-navbar-target">
-    <div class="site-mobile-menu-header">
-        <div class="site-mobile-menu-close">
-            <span class="icofont-close js-menu-toggle"></span>
-        </div>
-    </div>
-    <div class="site-mobile-menu-body"></div>
-</div>
 
-<nav class="site-nav">
-    <div class="container">
-        <div class="menu-bg-wrap">
-            <div class="site-navigation">
-                <a href="#" class="logo m-0">Canaco<span class="text-primary">.</span></a>
-                
-                <div class="site-navigation-center text-center">
-                    <form action="#" class="search-form d-inline-block d-lg-none">
-                        <input type="text" class="form-control" placeholder="Buscar...">
-                        <span class="bi-search"></span>
-                    </form>
-                    <ul class="js-clone-nav d-none d-lg-inline-block text-start site-menu mx-auto">
-                        <li class="active"><a href="{% url 'home:index' %}">Inicio</a></li>
-                        <li class="has-children">
-                            <a href="{% url 'home:categoria' %}">Categoría</a>
-                            <ul class="dropdown">                 
-                                <!-- Aquí está el cambio clave -->
-                                {% for categoria in global_categorias %}
-                                <li><a href="{% url 'home:categoria_detalle' categoria.id %}">{{ categoria.nombre }}</a></li>
-                                {% endfor %}
-                            </ul>
-                        </li>
-                        <li><a href="{% url 'home:perfil' %}">Perfil</a></li>
-                    </ul>
-                </div>
+<header id="header" class="header position-relative">
 
-                <div class="site-navigation-actions">
-                    <a href="#" class="burger ms-auto site-menu-toggle js-menu-toggle d-inline-block d-lg-none light">
-                        <span></span>
+    <div class="container-fluid container-xl position-relative">
+
+        <div class="top-row d-flex align-items-center justify-content-between">
+
+            <a href="{% url 'home:index' %}" class="logo d-flex align-items-end">
+                <h1 class="sitename">Noticias CANACO</h1>
+                <span>.</span>
+            </a>
+
+            <div class="d-flex align-items-center">
+                <div class="social-links">
+                    <a href="#" class="facebook">
+                        <i class="bi bi-facebook"></i>
                     </a>
-                    
-                    {% if request.user.is_authenticated %}
-                        <div class="d-none d-lg-flex align-items-center justify-content-end gap-2">
-                            <a href="" class="text-white"></a>
-                            <form method="post" action="{% url 'home:logout' %}">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-outline-light">Cerrar sesión</button>
-                            </form>
-                        </div>
-                    {% else %}
-                        <div class="d-none d-lg-flex align-items-center justify-content-end gap-2">
-                            <a href="{% url 'home:login' %}" class="text-white">Iniciar sesión</a>
-                            <a href="{% url 'home:sign_up' %}" class="btn btn-sm btn-outline-light">Registro</a>
-                        </div>
-                    {% endif %}
-                </div>
 
+                    <a href="#" class="instagram">
+                        <i class="bi bi-instagram"></i>
+                    </a>
+                </div>
             </div>
+
         </div>
     </div>
-</nav>
+
+    <div class="nav-wrap">
+
+        <div class="container d-flex justify-content-center position-relative">
+
+            <nav id="navmenu" class="navmenu">
+
+                <ul>
+
+                    <li>
+                        <a href="{% url 'home:index' %}">
+                            Inicio
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{% url 'home:category' %}">
+                            Categorías
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{% url 'home:contactanos' %}">
+                            Contacto
+                        </a>
+                    </li>
+
+                    {% if request.user.is_authenticated %}
+
+                        <li>
+                            <a href="{% url 'home:perfil' %}">
+                                Mi perfil
+                            </a>
+                        </li>
+
+                        {% if request.user.is_staff %}
+                            <li>
+                                <a href="{% url 'home:crud_noticias' %}">
+                                    Administración
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        <li>
+                            <a href="{% url 'home:logout' %}"
+                               onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                Cerrar sesión
+                            </a>
+                        </li>
+
+                        <form id="logout-form"
+                              method="POST"
+                              action="{% url 'home:logout' %}"
+                              style="display:none;">
+                            {% csrf_token %}
+                        </form>
+
+                    {% else %}
+
+                        <li>
+                            <a href="{% url 'home:login' %}">
+                                Iniciar sesión
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{% url 'home:sign_up' %}">
+                                Registrarse
+                            </a>
+                        </li>
+
+                    {% endif %}
+
+                </ul>
+
+                <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+
+            </nav>
+
+        </div>
+    </div>
+
+</header>

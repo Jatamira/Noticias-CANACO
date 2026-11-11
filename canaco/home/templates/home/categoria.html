@@ -15,7 +15,7 @@
             
             <div class="col-lg-4">
                 <select class="form-control" onchange="if (this.value) window.location.href=this.value;">
-                    <option value="{% url 'home:categoria' %}">Todas las categorías</option>
+                    <option value="{% url 'home:category' %}">Todas las categorías</option>
                     {% for categoria in categorias %}
                     <option value="{% url 'home:categoria_detalle' categoria.id %}" {% if categoria_actual and categoria_actual.id == categoria.id %}selected{% endif %}>{{ categoria.nombre }}</option>
                     {% endfor %}
@@ -30,7 +30,7 @@
                     {% if noticia.imagen_portada %}
                     <img src="{{ noticia.imagen_portada.display_url }}" alt="{{ noticia.titulo }}" class="img-fluid category-post-image">
                     {% else %}
-                    <img src="{% static 'images/img_1_horizontal.jpg' %}" alt="{{ noticia.titulo }}" class="img-fluid category-post-image">
+                    <img src="{% static 'nuevo_template/img/blog/blog-post-3.webp' %}" alt="{{ noticia.titulo }}" class="img-fluid category-post-image">
                     {% endif %}
                 </a>
             </div>

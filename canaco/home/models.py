@@ -124,3 +124,34 @@ default=ESTADO_PENDIENTE)
         managed = True
         db_table = 'comentario'
         verbose_name_plural = 'Comentarios'        
+
+class MensajeContacto(models.Model):
+
+    ESTADO_NUEVO = 'nuevo'
+    ESTADO_ATENDIDO = 'atendido'
+
+    ESTADOS = [
+        (ESTADO_NUEVO, 'Nuevo'),
+        (ESTADO_ATENDIDO, 'Atendido'),
+    ]
+
+    nombre = models.CharField(max_length=150)
+    correo = models.EmailField()
+    telefono = models.CharField(max_length=20, blank=True)
+    asunto = models.CharField(max_length=150)
+    mensaje = models.TextField()
+    estado = models.CharField(
+        max_length=20,
+        choices=ESTADOS,
+        default=ESTADO_NUEVO
+    )
+    createdat = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'mensaje_contacto'
+        verbose_name = 'Mensaje de contacto'
+        verbose_name_plural = 'Mensajes de contacto'
+        ordering = ['-createdat']
+
+    def __str__(self):
+        return f'{self.nombre} - {self.asunto}'

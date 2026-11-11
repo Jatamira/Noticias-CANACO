@@ -6,25 +6,25 @@ from . import views
 app_name = "home"
 
 urlpatterns = [
+    # Rutas principales con el nuevo template
     path("", views.index, name="index"),
     path("base/", views.base, name="base"),
     path("contactanos/", views.contactanos, name="contactanos"),
-    
-    # Autenticación y registro
-    path("login/", auth_views.LoginView.as_view(template_name='home/login.html'), name="login"),
-    path("logout/", LogoutView.as_view(next_page='home:login'), name="logout"),
+    path("categoria/", views.category, name="category"),
+    path("author-profile/", views.author_profile, name="author-profile"),
+    path("login/", views.login, name="login"),
     path("sign_up/", views.sign_up, name="sign_up"),
+    path("logout/", LogoutView.as_view(next_page='home:login'), name="logout"),
     
-# Publicaciones y vistas generales
+    # Publicaciones y vistas generales
     path("noticia/", views.noticia, name="noticia"),
     path("perfil/", views.perfil, name="perfil"),
     path("crud_perfil/", views.crud_perfil, name="crud_perfil"),
     path("publicacion/", views.crear_publicacion, name="crear_publicacion"),
-    path("categoria/", views.categoria, name="categoria"),
     
     # Módulo de usuarios (CRUD)
     path("crud_usuarios/", views.crud_usuarios, name="crud_usuarios"),
-    path("crud_usuarios/crear/", views.crear_usuario, name="crear_usuario"),  # <--- Único con este nombre
+    path("crud_usuarios/crear/", views.crear_usuario, name="crear_usuario"),
     path("crud_usuarios/<int:pk>/editar/", views.editar_usuario, name="editar_usuario"),
     path("crud_usuarios/<int:pk>/bloquear/", views.bloquear_usuario, name="bloquear_usuario"),
     path("crud_usuarios/<int:pk>/eliminar/", views.eliminar_usuario, name="eliminar_usuario"),
@@ -43,7 +43,9 @@ urlpatterns = [
     path("crud_noticias/<int:pk>/publicar", views.publicar_publicacion, name="publicar_publicacion"),
     path("crud_noticias/<int:pk>/eliminar", views.eliminar_publicacion, name="eliminar_publicacion"),
 
-    path("categoria/<int:pk>", views.categoria, name="categoria_detalle"),
+    # CORREGIDO: Apuntando a views.category en lugar de views.categoria
+    path("categoria/<int:pk>", views.category, name="categoria_detalle"),
+    
     path("categorias/", views.crud_categorias, name="crud_categorias"),
     path("crud_categorias/<int:pk>/editar/", views.editar_categoria, name="editar_categoria"),
     path("crud_categorias/<int:pk>/eliminar/", views.eliminar_categoria, name="eliminar_categoria"),

@@ -1,0 +1,324 @@
+
+{% extends 'partials/base.html' %}
+{% load static %}
+
+{% block title %}Inicio | Noticias CANACO{% endblock %}
+{% block body_class %}index-page{% endblock %}
+
+{% block content %}
+
+<main class="main">
+
+  <!-- =========================
+       1. BLOG HERO SECTION
+       Cinco noticias más vistas
+  ========================== -->
+  <section id="blog-hero" class="blog-hero section">
+
+    <div class="container">
+      <div class="blog-grid">
+
+        {% for publicacion in mas_vistas %}
+
+          <article class="blog-item {% if forloop.first %}featured{% endif %}">
+
+            <img
+              src="{% if publicacion.imagen_portada %}{{ publicacion.imagen_portada.display_url }}{% else %}{% static 'nuevo_template/img/blog/blog-post-3.webp' %}{% endif %}"
+              alt="{{ publicacion.titulo }}"
+              class="img-fluid"
+            >
+
+            <div class="blog-content">
+
+              <div class="post-meta">
+                <span class="date">
+                  {{ publicacion.createdat|date:"d M Y" }}
+                </span>
+
+                {% if publicacion.categoria %}
+                  <span class="category">
+                    {{ publicacion.categoria.nombre }}
+                  </span>
+                {% endif %}
+              </div>
+
+              {% if forloop.first %}
+                <h2 class="post-title">
+                  <a href="{% url 'home:noticia_detalle' publicacion.pk %}">
+                    {{ publicacion.titulo }}
+                  </a>
+                </h2>
+              {% else %}
+                <h3 class="post-title">
+                  <a href="{% url 'home:noticia_detalle' publicacion.pk %}">
+                    {{ publicacion.titulo }}
+                  </a>
+                </h3>
+              {% endif %}
+
+            </div>
+          </article>
+
+        {% empty %}
+
+          <div class="col-12">
+            <p>No hay noticias publicadas todavía.</p>
+          </div>
+
+        {% endfor %}
+
+      </div>
+    </div>
+
+  </section>
+  <!-- /Blog Hero Section -->
+
+
+  <!-- =========================
+       2. FEATURED POSTS SECTION
+       Carrusel de noticias recientes
+  ========================== -->
+  <section id="featured-posts" class="featured-posts section">
+
+    <div class="container section-title">
+      <h2>Noticias recientes</h2>
+      <p>Conoce las últimas noticias y acontecimientos.</p>
+    </div>
+
+    <div class="container">
+
+      <div class="swiper blog-posts-slider init-swiper">
+
+        <script type="application/json" class="swiper-config">
+          {
+            "loop": true,
+            "speed": 800,
+            "autoplay": {
+              "delay": 3000,
+              "disableOnInteraction": false
+            },
+            "slidesPerView": 3,
+            "spaceBetween": 30,
+            "watchOverflow": true,
+            "breakpoints": {
+              "320": {
+                "slidesPerView": 1,
+                "spaceBetween": 20
+              },
+              "768": {
+                "slidesPerView": 2,
+                "spaceBetween": 20
+              },
+              "1200": {
+                "slidesPerView": 3,
+                "spaceBetween": 30
+              }
+            }
+          }
+        </script>
+
+        <div class="swiper-wrapper">
+
+          {% for publicacion in recientes %}
+
+            <div class="swiper-slide">
+
+              <div class="blog-post-item">
+
+                <div class="post-img">
+                  <img
+                    src="{% if publicacion.imagen_portada %}{{ publicacion.imagen_portada.display_url }}{% else %}{% static 'nuevo_template/img/blog/blog-post-portrait-1.webp' %}{% endif %}"
+                    alt="{{ publicacion.titulo }}"
+                    class="img-fluid"
+                  >
+                </div>
+
+                <div class="blog-post-content">
+
+                  <div class="post-meta">
+                    <span>
+                      {% if publicacion.autor %}
+                        {{ publicacion.autor.username }}
+                      {% else %}
+                        CANACO
+                      {% endif %}
+                    </span>
+
+                    <span class="date">
+                      {{ publicacion.createdat|date:"d M Y" }}
+                    </span>
+                  </div>
+
+                  <h2 class="post-title">
+                    <a href="{% url 'home:noticia_detalle' publicacion.pk %}">
+                      {{ publicacion.titulo }}
+                    </a>
+                  </h2>
+
+                  <p>
+                    {{ publicacion.resumen|truncatechars:130 }}
+                  </p>
+
+                  <a
+                    href="{% url 'home:noticia_detalle' publicacion.pk %}"
+                    class="read-more"
+                  >
+                    Leer noticia
+                    <i class="bi bi-arrow-right"></i>
+                  </a>
+
+                </div>
+              </div>
+
+            </div>
+
+          {% empty %}
+
+            <div class="swiper-slide">
+              <p>No hay noticias recientes.</p>
+            </div>
+
+          {% endfor %}
+
+        </div>
+
+        <div class="swiper-pagination"></div>
+
+      </div>
+
+    </div>
+
+  </section>
+  <!-- /Featured Posts Section -->
+
+
+  <!-- =========================
+       3. CATEGORY SECTION
+       Una noticia por categoría
+  ========================== -->
+  <section id="category-section" class="category-section section">
+
+    <div class="container section-title">
+      <h2>Noticias por categoría</h2>
+      <p>Explora las noticias según su categoría.</p>
+    </div>
+
+    <div class="container">
+
+      <!-- Primeras tres categorías -->
+      <div class="row gy-4 mb-4">
+
+        {% for item in noticias_por_categoria|slice:":3" %}
+
+          <div class="col-lg-4">
+
+            <article class="featured-post">
+
+              <div class="post-img">
+                <img
+                  src="{% if item.publicacion.imagen_portada %}{{ item.publicacion.imagen_portada.display_url }}{% else %}{% static 'nuevo_template/img/blog/blog-post-9.webp' %}{% endif %}"
+                  alt="{{ item.publicacion.titulo }}"
+                  class="img-fluid"
+                >
+              </div>
+
+              <div class="post-content">
+
+                <div class="category-meta">
+                  <span class="post-category">
+                    {{ item.categoria.nombre }}
+                  </span>
+                </div>
+
+                <h2 class="title">
+                  <a href="{% url 'home:noticia_detalle' item.publicacion.pk %}">
+                    {{ item.publicacion.titulo }}
+                  </a>
+                </h2>
+
+                <div class="author-meta">
+                  <span class="author">
+                    {% if item.publicacion.autor %}
+                      {{ item.publicacion.autor.username }}
+                    {% else %}
+                      CANACO
+                    {% endif %}
+                  </span>
+
+                  <span class="date">
+                    {{ item.publicacion.createdat|date:"d M Y" }}
+                  </span>
+                </div>
+
+              </div>
+
+            </article>
+
+          </div>
+
+        {% endfor %}
+
+      </div>
+
+
+      <!-- Categorías restantes -->
+      <div class="row">
+
+        {% for item in noticias_por_categoria|slice:"3:" %}
+
+          <div class="col-xl-4 col-lg-6">
+
+            <article class="list-post">
+
+              <div class="post-img">
+                <img
+                  src="{% if item.publicacion.imagen_portada %}{{ item.publicacion.imagen_portada.display_url }}{% else %}{% static 'nuevo_template/img/blog/blog-post-7.webp' %}{% endif %}"
+                  alt="{{ item.publicacion.titulo }}"
+                  class="img-fluid"
+                >
+              </div>
+
+              <div class="post-content">
+
+                <div class="category-meta">
+                  <span class="post-category">
+                    {{ item.categoria.nombre }}
+                  </span>
+                </div>
+
+                <h3 class="title">
+                  <a href="{% url 'home:noticia_detalle' item.publicacion.pk %}">
+                    {{ item.publicacion.titulo }}
+                  </a>
+                </h3>
+
+                <div class="post-meta">
+                  <span class="date">
+                    {{ item.publicacion.createdat|date:"d M Y" }}
+                  </span>
+                </div>
+
+              </div>
+
+            </article>
+
+          </div>
+
+        {% endfor %}
+
+      </div>
+
+      {% if not noticias_por_categoria %}
+        <p class="text-center">
+          Todavía no hay noticias disponibles por categoría.
+        </p>
+      {% endif %}
+
+    </div>
+
+  </section>
+  <!-- /Category Section -->
+
+</main>
+
+{% endblock %}

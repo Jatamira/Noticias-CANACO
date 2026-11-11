@@ -1,0 +1,204 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Mi Perfil - Noticias Canaco</title>
+
+  <!-- Favicons -->
+  <link href="{% static 'nuevo_template/img/favicon.png' %}" rel="icon">
+  <link href="{% static 'nuevo_template/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{% static 'nuevo_template/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'nuevo_template/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'nuevo_template/vendor/aos/aos.css' %}" rel="stylesheet">
+  <link href="{% static 'nuevo_template/vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet">
+  <link href="{% static 'nuevo_template/vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="{% static 'nuevo_template/css/main.css' %}" rel="stylesheet">
+  
+  <!-- Estilos del Panel Lateral de tu proyecto anterior -->
+  <style>
+    .admin-layout {
+        display: flex;
+        min-height: 70vh;
+    }
+    .admin-sidebar {
+        width: 260px;
+        background: #f8f9fa;
+        border-right: 1px solid #dee2e6;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    .admin-sidebar .nav-link-item {
+        padding: 12px 20px;
+        color: #dc3545;
+        text-decoration: none;
+        display: block;
+        border-bottom: 1px solid #e9ecef;
+        font-weight: 500;
+    }
+    .admin-sidebar .nav-link-item:hover, .admin-sidebar .nav-link-item.active {
+        background: #dc3545;
+        color: #fff;
+        border-left: 5px solid #ffc107;
+    }
+    .admin-content {
+        flex: 1;
+        padding: 40px;
+        background: #ffffff;
+    }
+  </style>
+</head>
+
+<body class="profile-page">
+
+  <!-- Header del Nuevo Template -->
+  <header id="header" class="header position-relative">
+    <div class="container-fluid container-xl position-relative">
+      <div class="top-row d-flex align-items-center justify-content-between">
+        <a href="{% url 'home:index' %}" class="logo d-flex align-items-end">
+          <h1 class="sitename">Noticias Canaco</h1><span>.</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="nav-wrap">
+      <div class="container d-flex justify-content-center position-relative">
+        <nav id="navmenu" class="navmenu">
+          <ul>
+            <li><a href="{% url 'home:index' %}">Home</a></li>
+            <li><a href="{% url 'home:category' %}">Category</a></li>
+            <li><a href="{% url 'home:perfil' %}" class="active">Perfil</a></li>
+            <li><a href="{% url 'home:author-profile' %}">Autor</a></li>
+            <li><a href="{% url 'home:contactanos' %}">Contact</a></li>
+            <li><a href="{% url 'home:login' %}">Login</a></li>
+            <li><a href="{% url 'home:sign_up' %}">Sign Up</a></li>
+          </ul>
+          <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- Page Title -->
+    <div class="page-title">
+      <div class="container d-lg-flex justify-content-between align-items-center">
+        <h1 class="mb-2 mb-lg-0">Panel de Administración</h1>
+        <nav class="breadcrumbs">
+          <ol>
+            <li><a href="{% url 'home:index' %}">Home</a></li>
+            <li>Mi Perfil</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Contenido principal con el Sidebar y el Panel de Perfil -->
+    <div class="container my-4">
+      <div class="admin-layout border rounded shadow-sm bg-white overflow-hidden">
+        
+        <!-- Menú Lateral Izquierdo (Rojo) -->
+        <div class="admin-sidebar">
+          <div class="sidebar-links">
+            <a href="{% url 'home:perfil' %}" class="nav-link-item active">Mi Perfil</a>
+            <a href="{% url 'home:crud_noticias' %}" class="nav-link-item">Noticias</a>
+            <a href="{% url 'home:crud_comentarios' %}" class="nav-link-item">Comentarios</a>
+            <a href="{% url 'home:crud_categorias' %}" class="nav-link-item">Categorías</a>
+            <a href="{% url 'home:crud_usuarios' %}" class="nav-link-item">Usuarios</a>
+            <a href="{% url 'home:crud_cambiar_contrasena' %}" class="nav-link-item">Cambiar contraseña</a>
+          </div>
+          <div class="sidebar-footer p-3 bg-danger text-center">
+            <form action="{% url 'home:logout' %}" method="POST" class="m-0">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger w-100 fw-bold text-uppercase">Cerrar sesión</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Área Central de Contenido (Tus datos de Perfil) -->
+        <div class="admin-content">
+          
+          {% if messages %}
+          <div class="mb-4">
+              {% for message in messages %}
+              <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                  {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+              </div>
+              {% endfor %}
+          </div>
+          {% endif %}
+
+          <div class="text-center mb-4">
+              {% if perfil_usuario.foto_perfil %}
+              <img src="{{ perfil_usuario.foto_perfil.display_url }}" alt="Foto de perfil" class="rounded-circle shadow-sm" width="100" height="100" style="object-fit: cover;">
+              {% else %}
+              <div class="bg-secondary rounded-circle d-inline-flex align-items-center justify-content-center text-white" style="width: 100px; height: 100px; font-size: 40px;">
+                  <i class="bi bi-person"></i>
+              </div>
+              {% endif %}
+          </div>
+
+          <div class="row g-3 mb-4">
+              <div class="col-md-6 border-bottom pb-2">
+                  <span class="text-muted d-block small">Usuario:</span>
+                  <strong>{{ request.user.username }}</strong>
+              </div>
+              <div class="col-md-6 border-bottom pb-2">
+                  <span class="text-muted d-block small">Nombre:</span>
+                  <strong>{{ request.user.first_name|default:"Sin registrar" }}</strong>
+              </div>
+              <div class="col-md-6 border-bottom pb-2">
+                  <span class="text-muted d-block small">Paterno:</span>
+                  <strong>{{ perfil_usuario.apellido_paterno|default:"Sin registrar" }}</strong>
+              </div>
+              <div class="col-md-6 border-bottom pb-2">
+                  <span class="text-muted d-block small">Materno:</span>
+                  <strong>{{ perfil_usuario.apellido_materno|default:"Sin registrar" }}</strong>
+              </div>
+              <div class="col-12 border-bottom pb-2">
+                  <span class="text-muted d-block small">Correo electrónico:</span>
+                  <strong>{{ request.user.email|default:"Sin registrar" }}</strong>
+              </div>
+          </div>
+
+          <div class="text-center">
+              <a href="{% url 'home:crud_perfil' %}" class="btn btn-success px-4">Editar mi perfil</a>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer del Nuevo Template -->
+  <footer id="footer" class="footer">
+    <div class="container copyright text-center mt-4">
+      <p>© <span>Copyright</span> <strong class="px-1 sitename">Canaco</strong> <span>All Rights Reserved</span></p>
+    </div>
+  </footer>
+
+  <!-- Vendor JS Files -->
+  <script src="{% static 'nuevo_template/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'nuevo_template/vendor/aos/aos.js' %}"></script>
+  <script src="{% static 'nuevo_template/vendor/swiper/swiper-bundle.min.js' %}"></script>
+  <script src="{% static 'nuevo_template/vendor/glightbox/js/glightbox.min.js' %}"></script>
+
+</body>
+
+</html>
